@@ -1,0 +1,13 @@
+name = "AmbientForcing"
+uuid = "e2f64fc7-2bff-4a84-bd3f-8a41fe73f145"
+authors = ["Anna <buettner.anna@googlemail.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
