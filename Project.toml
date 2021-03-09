@@ -1,7 +1,12 @@
 name = "AmbientForcing"
 uuid = "e2f64fc7-2bff-4a84-bd3f-8a41fe73f145"
-authors = ["Anna <buettner.anna@googlemail.com> and contributors"]
+authors = ["Anna and contributors"]
 version = "0.1.0"
+
+[deps]
+DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+NetworkDynamics = "22e9dc34-2a0d-11e9-0de0-8588d035468b"
+PowerDynamics = "cc46b21f-1b17-51c2-b642-af74c3d3a8be"
 
 [compat]
 julia = "1"
