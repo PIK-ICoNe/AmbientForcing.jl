@@ -9,7 +9,6 @@ NetworkDynamics = "22e9dc34-2a0d-11e9-0de0-8588d035468b"
 PowerDynamics = "cc46b21f-1b17-51c2-b642-af74c3d3a8be"
 
 [compat]
-DifferentialEquations = "6.16"
 julia = "1"
 
 [extras]
