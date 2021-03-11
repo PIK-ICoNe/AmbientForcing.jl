@@ -5,14 +5,16 @@ version = "0.1.0"
 
 [deps]
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 NetworkDynamics = "22e9dc34-2a0d-11e9-0de0-8588d035468b"
 PowerDynamics = "cc46b21f-1b17-51c2-b642-af74c3d3a8be"
 
 [compat]
-PowerDynamics = "2.4"
-NetworkDynamics = "0.5"
 DifferentialEquations = "6.16"
-
+NetworkDynamics = "0.4"
+PowerDynamics = "2.4"
 julia = "1"
 
 [extras]

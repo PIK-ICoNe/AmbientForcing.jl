@@ -29,7 +29,7 @@ This consists of the following steps:
     dist: Distribution function e.g. Uniform, Normal....
     tau: Integration time
 """
-function AmbientForcing(f::ODEFunction, z, tau, Frand)
+function ambient_forcing(f::ODEFunction, z, tau, Frand)
     g = constraint_equations(f)
     prob = ODEProblem(ambient_forcing_ODE, z, (0.0, tau), (g, Frand))
     sol = solve(prob)

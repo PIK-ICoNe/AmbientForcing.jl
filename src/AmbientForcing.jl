@@ -1,6 +1,18 @@
 module AmbientForcing
 
     using NetworkDynamics
-    using DifferentialEquations
+    using DifferentialEquations: solve, ODEFunction, ODEProblem
     using PowerDynamics
+    using Distributions
+    using ForwardDiff
+    using LinearAlgebra: nullspace
+    include("AmbientForcingODE.jl")
+    include("RandInitVectors.jl")
+
+    export ambient_forcing
+    export random_force
+    export idx_exclusive
+    export pd_node_idx
+    export full_str
+    export voltage_str
 end
