@@ -1,7 +1,6 @@
 module AmbientForcing
 
-    using DifferentialEquations: solve, ODEFunction, ODEProblem
-    #using Distributions
+    using OrdinaryDiffEq: solve, ODEFunction, ODEProblem
     using ForwardDiff: jacobian
     using LinearAlgebra: nullspace
     include("AmbientForcingODE.jl")
@@ -10,4 +9,5 @@ module AmbientForcing
     export ambient_forcing
     export random_force
     export idx_exclusive
+    export constraint_equations
 end
