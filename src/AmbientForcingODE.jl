@@ -59,7 +59,7 @@ ż = Pn(ker(Jg)) * h
 """
 function ambient_forcing_ODE(u, p, t)
     g, h = p
-    Jacg = ForwardDiff.jacobian(g, u)
+    Jacg = jacobian(g, u)
     N = nullspace(Jacg)
     du = Proj_N(N) * h # Projection back onto the Manifold
 end
