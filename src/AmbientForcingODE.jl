@@ -32,7 +32,7 @@ This consists of the following steps:
 function ambient_forcing(f::ODEFunction, z, tau, Frand)
     g = constraint_equations(f)
     prob = ODEProblem(ambient_forcing_ODE, z, (0.0, tau), (g, Frand))
-    sol = solve(prob)
+    sol = solve(prob, Tsit5())
     return sol[end]
 end
 
