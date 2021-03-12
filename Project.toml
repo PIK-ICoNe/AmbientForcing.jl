@@ -13,6 +13,7 @@ PowerDynamics = "cc46b21f-1b17-51c2-b642-af74c3d3a8be"
 
 [compat]
 DifferentialEquations = "6.16"
+Distributions = "0.24"
 NetworkDynamics = "0.4"
 PowerDynamics = "2.4"
 julia = "1"
