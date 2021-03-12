@@ -1,7 +1,7 @@
 module AmbientForcing
 
     using DifferentialEquations: solve, ODEFunction, ODEProblem
-    using Distributions
+    #using Distributions
     using ForwardDiff: jacobian
     using LinearAlgebra: nullspace
     include("AmbientForcingODE.jl")
