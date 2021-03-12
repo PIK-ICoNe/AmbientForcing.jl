@@ -1,10 +1,8 @@
 module AmbientForcing
 
-    using NetworkDynamics
     using DifferentialEquations: solve, ODEFunction, ODEProblem
-    using PowerDynamics
     using Distributions
-    using ForwardDiff
+    using ForwardDiff: jacobian
     using LinearAlgebra: nullspace
     include("AmbientForcingODE.jl")
     include("RandInitVectors.jl")
