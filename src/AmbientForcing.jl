@@ -1,6 +1,6 @@
 module AmbientForcing
 
-    using OrdinaryDiffEq: solve, ODEFunction, ODEProblem
+    using OrdinaryDiffEq: solve, ODEFunction, ODEProblem, Tsit5
     using ForwardDiff: jacobian
     using LinearAlgebra: nullspace
     include("AmbientForcingODE.jl")
