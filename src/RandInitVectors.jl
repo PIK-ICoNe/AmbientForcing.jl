@@ -3,11 +3,17 @@
 """
 function idx_exclusive(f::ODEFunction, str::Array{String})
     idx_vec = Array{Int64}(undef, length(str))
-   
+   if f.syms == nothing
+    error("Your ODEFunction has no symbols.")
+   end
     for j in 1:length(str)
         for (i, s) in enumerate(f.syms)
             if string(str[j]) == string(s)
                 idx_vec[j] = i
+                break
+            end
+            if i == length(f.syms)
+                error("Symbol was not found.")
             end
         end
     end

@@ -7,6 +7,9 @@ f must be in Mass Matrix form meaning: M ẋ = f(x).
 """
 function constraint_equations(f::ODEFunction)
     M = f.mass_matrix
+    if M == true*I
+        error("There are no constraints in the system!")
+    end
     len_M = size(M, 1)
     g_idx = findall([M[i,i] for i in 1:len_M] .== 0)
     g(x) = (dx = similar(x);

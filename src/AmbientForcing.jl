@@ -2,7 +2,7 @@ module AmbientForcing
 
     using OrdinaryDiffEq: solve, ODEFunction, ODEProblem, Tsit5
     using ForwardDiff: jacobian
-    using LinearAlgebra: nullspace
+    using LinearAlgebra: nullspace, I
     include("AmbientForcingODE.jl")
     include("RandInitVectors.jl")
 
