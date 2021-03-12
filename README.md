@@ -24,14 +24,14 @@ rpg = rhs(pg) # get the rigth-hand-side as an ODEFunction
 op = find_operationpoint(pg) # the fix point natrually lie on the manifold
 ```
 
-Then all variables of the power grid can be perturbed:
+Then all variables of the power grid can be perturbed while still fulfilling the constraints:
 ```
 using Distributions
 Frand = random_force(rpg, [0.0,1], Uniform)
 sol = ambient_forcing(rpg, op.vec, 2.0, Frand)
 ```
 
-Or just the voltage of node 2:
+Or just the voltage of node 2 is perturbed without violating the constraint at node 1:
 ```
 idx = idx_exclusive(rpg, ["u_r_2", "u_i_2"])
 
