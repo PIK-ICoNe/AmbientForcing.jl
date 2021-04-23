@@ -15,5 +15,16 @@ Literate.markdown(joinpath(path, "PowerDynamics_example.jl"), OUTPUT)
 makedocs(sitename="AmbientForcing.jl",
         modules = [AmbientForcing],
         authors = "Anna Büttner and contributors",
-        format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true")
+        format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
+        pages = [
+        "Home" => "index.md",
+        "Examples" => ["OrdinaryDiffEq" => "generated/DifferentialEquation_example.md",
+                       "PowerDynamics" => "generated/PowerDynamics_example.md",
+                       "NetworkDynamics" => "generated/NetworkDynamics_example.md"]
+    ],
+)
+
+deploydocs(;
+    repo="github.com/Anbue/AmbientForcing.jl",
+    devbranch="master",
 )
