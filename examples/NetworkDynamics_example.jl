@@ -19,7 +19,7 @@ g = barabasi_albert(N_plastic, k)
 =#
 
 
-@inline function kuramoto_plastic_edge!(de, e, v_s, v_d, p, t)
+function kuramoto_plastic_edge!(de, e, v_s, v_d, p, t)
     # The coupling function is modeled by a differential algebraic equation with mass matrix
     # 0 * de[1] = e[2] * sin(v_s[1] - v_d[1] + α) / N - e[1] is equivalent to
     # e[1] = e[2] * sin(v_s[1] - v_d[1] + α) / N
@@ -30,7 +30,7 @@ g = barabasi_albert(N_plastic, k)
     nothing
 end
 
-@inline function kuramoto_plastic_vertex!(dv, v, edges, p, t)
+function kuramoto_plastic_vertex!(dv, v, edges, p, t)
     dv .= 0
     for e in edges
         dv .-= e[1]

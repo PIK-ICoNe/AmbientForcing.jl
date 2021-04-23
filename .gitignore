@@ -1,2 +1,5 @@
 /Manifest.toml
-.vscode
+.vscode/
+docs/build
+docs/Manifest.toml
+docs/src/generated
