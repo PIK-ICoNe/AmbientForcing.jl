@@ -25,6 +25,6 @@ makedocs(sitename="AmbientForcing.jl",
 )
 
 deploydocs(;
-    repo="github.com/Anbue/AmbientForcing.jl",
-    devbranch="master",
+    repo = "github.com/Anbue63/AmbientForcing.jl",
+    devbranch = "master",
 )
