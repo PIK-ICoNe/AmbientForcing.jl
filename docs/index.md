@@ -31,7 +31,7 @@ For an arbitrary dynamic $\dot z = h(z)$ the manifold preserving version can sim
         \dot z = P^\mathcal{N}(z) h(z)
     \end{align}
 ```
-Where P^\mathcal{N}(z) is a projection matrix.
+Where $P^\mathcal{N}(z)$ is a projection matrix.
 
 ```@docs
 ambient_forcing
