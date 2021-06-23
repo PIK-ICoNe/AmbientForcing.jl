@@ -6,7 +6,6 @@ using PowerDynamics
 using Distributions
 using LightGraphs
 
-
 # generate examples
 examples = [
     joinpath(@__DIR__, "..", "examples", "DifferentialEquation_example.jl"),
@@ -19,6 +18,7 @@ isdir(OUTPUT) && rm(OUTPUT, recursive=true)
 mkpath(OUTPUT)
 
 for ex in examples
+    println(OUTPUT)
     Literate.markdown(ex, OUTPUT)
     Literate.script(ex, OUTPUT)
 end
@@ -35,14 +35,15 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "Examples" => ["DiffEq" => "generated/DifferentialEquation_example.md",
-                       "NetworkDynamics" => "generated/NetworkDynamics_example.md",
-                       "PowerDynamics" => "generated/PowerDynamics_example.md"]
+        "Examples" => ["DiffEq" => "DifferentialEquation_example.md",
+                       "NetworkDynamics" => "NetworkDynamics_example.md",
+                       "PowerDynamics" => "PowerDynamics_example.md"]
     ],
 )
+
 
 deploydocs(;
     repo="github.com/Anbue63/AmbientForcing.jl",
     devbranch="master",
-    # push_preview=true,
+    push_preview=true,
 )
