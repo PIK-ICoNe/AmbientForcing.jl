@@ -7,6 +7,7 @@ using Distributions
 using LightGraphs
 
 # generate examples
+#=
 examples = [
     joinpath(@__DIR__, "..", "examples", "DifferentialEquation_example.jl"),
     joinpath(@__DIR__, "..", "examples", "NetworkDynamics_example.jl"),
@@ -22,14 +23,14 @@ for ex in examples
     Literate.markdown(ex, OUTPUT)
     Literate.script(ex, OUTPUT)
 end
-
+=#
 makedocs(;
     modules=[AmbientForcing],
     authors="Anna Büttner and contributors",
     repo="https://github.com/Anbue63/AmbientForcing.jl",
     sitename="AmbientForcing.jl",
     format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
+        prettyurls=get(ENV, "CI", "false") == "false",
         canonical="https://github.com/Anbue63/AmbientForcing.jl",
         assets=String[],
     ),
