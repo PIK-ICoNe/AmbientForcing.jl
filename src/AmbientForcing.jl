@@ -5,7 +5,6 @@ module AmbientForcing
     using LinearAlgebra: nullspace, I
     include("AmbientForcingODE.jl")
     include("RandInitVectors.jl")
-
     export ambient_forcing
     export random_force
     export idx_exclusive
