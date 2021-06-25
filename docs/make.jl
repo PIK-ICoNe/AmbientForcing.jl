@@ -42,9 +42,7 @@ makedocs(;
     ],
 )
 
-
-deploydocs(;
-    repo="github.com/Anbue63/AmbientForcing.jl",
+deploydocs(
+    repo = "github.com/Anbue63/AmbientForcing.jl.git",
     devbranch="master",
-    push_preview=true,
 )
