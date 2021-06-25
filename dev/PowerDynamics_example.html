@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>PowerDynamics · AmbientForcing.jl</title><script data-outdated-warner src="assets/warner.js"></script><link rel="canonical" href="https://github.com/Anbue63/AmbientForcing.jl/PowerDynamics_example.html"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="index.html">AmbientForcing.jl</a></span></div><form class="docs-search" action="search.html"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="index.html">Home</a></li><li><span class="tocitem">Examples</span><ul><li><a class="tocitem" href="DifferentialEquation_example.html">DiffEq</a></li><li><a class="tocitem" href="NetworkDynamics_example.html">NetworkDynamics</a></li><li class="is-active"><a class="tocitem" href="PowerDynamics_example.html">PowerDynamics</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li class="is-active"><a href="PowerDynamics_example.html">PowerDynamics</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="PowerDynamics_example.html">PowerDynamics</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Anbue63/AmbientForcing.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><pre><code class="language-julia">using AmbientForcing
+using PowerDynamics, Distributions</code></pre><p>lets create a small test power grid with three nodes</p><pre><code class="language-julia">line_list = []
+append!(line_list, [StaticLine(from = 1, to = 2, Y = -1im / 0.02 + 4)])
+append!(line_list, [StaticLine(from = 1, to = 3, Y = -1im / 0.02 + 4)])
+
+node_list = []
+append!(node_list, [SlackAlgebraic(U = 1, Y_n = 0)])
+append!(node_list, [FourthOrderEq(H = 3.318, P = -0.6337, D = 0.1, Ω = 50, E_f = 0.5, T_d_dash = 0.1,  T_q_dash = 8.690,X_d_dash = 0.111,  X_q_dash = 0.103, X_d = 0.1, X_q = 0.6)])
+append!(node_list, [PQAlgebraic(P = -0.6337, Q = 0.0)]) # This is our constraint
+
+pg = PowerGrid(node_list, line_list)
+rpg = rhs(pg) # using the rigth hand side as our ODEFunction
+
+g = constraint_equations(rpg) # the constaint equation of the power grid</code></pre><pre class="documenter-example-output">(::AmbientForcing.var&quot;#g#3&quot;{SciMLBase.ODEFunction{true, nd_ODE_Static{SimpleGraph{Int64}, GraphData{NetworkDynamics.NetworkStructures.GraphDataBuffer{Vector{Float64}, Vector{Float64}}, Float64, Float64}, Vector{ODEVertex}, Vector{StaticEdge{PowerDynamics.var&quot;#rhs!#157&quot;{ComplexF64}}}}, SparseArrays.SparseMatrixCSC{Float64, Int64}, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Vector{Symbol}, Nothing, typeof(SciMLBase.DEFAULT_OBSERVED), Nothing}, Vector{Int64}}) (generic function with 1 method)</pre><p>the op is a fixed point and natrully lies on the manifold it can be used as the initial condition for our differential equation</p><pre><code class="language-julia">op = find_operationpoint(pg)
+
+g(op.vec) # g(op) ≈ 0, this means that the constraint is fulfilled</code></pre><pre class="documenter-example-output">4-element Vector{Float64}:
+  0.0
+ -3.325972847989401e-24
+  1.1102230246251565e-16
+  8.586881206085195e-16</pre><p>Lets generate a random vector from the ambient space first we want to perturb all variables in the grid</p><pre><code class="language-julia">Frand = random_force(rpg, [0.0,1], Uniform)
+
+z_new = ambient_forcing(rpg, op.vec, 2.0, Frand) # Our new valid inital condition
+g(z_new) # fulfills the constraints :-)
+
+# Next: lets perturb just the voltage at node 2!</code></pre><p>gettng the index of the real and imaginary part of the voltage</p><pre><code class="language-julia">idx = idx_exclusive(rpg, [&quot;u_r_2&quot;, &quot;u_i_2&quot;])</code></pre><pre class="documenter-example-output">2-element Vector{Int64}:
+ 3
+ 4</pre><p>genrate a vector only with non-vanishing componats the voltage at node 2</p><pre><code class="language-julia">Frand = random_force(rpg, [0.0, 1.0], Uniform, idx)
+
+z_new = ambient_forcing(rpg, op.vec, 2.0, Frand) # solve the differential equation
+g(z_new) # the constraint remains fulfilled</code></pre><pre class="documenter-example-output">4-element Vector{Float64}:
+  0.0
+ -3.325972847989401e-24
+  3.1086244689504383e-15
+  5.464378949326942e-16</pre><p>it is also possible to perturb the variable using different distributions: In typically SNBS the angle θ and ω are sampled from different boxes</p><pre><code class="language-julia">idx = idx_exclusive(rpg, [&quot;u_r_2&quot;, &quot;u_i_2&quot;, &quot;θ_2&quot;, &quot;ω_2&quot;])
+τ = 2.0 # the integration time</code></pre><pre class="documenter-example-output">2.0</pre><p>when you want to sample eg. the angle θ from a box of [0, 2π] you have to make sure to devide the distribution argument by the integration time τ</p><pre><code class="language-julia">dist_vec = [[0,1], [0, 2], [0, 2π] ./τ, [-5, 5] ./τ]</code></pre><pre class="documenter-example-output">4-element Vector{Vector{Float64}}:
+ [0.0, 1.0]
+ [0.0, 2.0]
+ [0.0, 3.141592653589793]
+ [-2.5, 2.5]</pre><p>then everything works as beforehand only each variable is sampled from a different box</p><pre><code class="language-julia">Frand = Frand = random_force(rpg, dist_vec, Uniform, idx)
+z_new = ambient_forcing(rpg, op.vec, τ, Frand) # solve the differential equation
+g(z_new)</code></pre><pre class="documenter-example-output">4-element Vector{Float64}:
+  0.0
+ -3.325972847989401e-24
+  2.9976021664879227e-15
+  5.568462357885551e-16</pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="NetworkDynamics_example.html">« NetworkDynamics</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 25 June 2021 14:47">Friday 25 June 2021</span>. Using Julia version 1.6.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
