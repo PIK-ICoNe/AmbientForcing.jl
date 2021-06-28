@@ -1,6 +1,6 @@
 # AmbientForcing
 
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://anbue63.github.io/AmbientForcing.jl/)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://anbue63.github.io/AmbientForcing.jl/dev)
 
 A package which is able to calculate valid initial conditions for differential algebraic equation (DAEs) in mass matrix form.
 The solutions of DAEs lie on constraint manifolds and not every state is valid anymore. Using the ambient forcing algorithm it is possible to calculate new valid states on the manifold.
