@@ -42,12 +42,14 @@ g_nd(x0_plastic)
 
 Frand = random_force(kuramoto_plastic!, [0.0, 1.0], Uniform)
 z_new = ambient_forcing(kuramoto_plastic!, x0_plastic, 2.0, Frand)
-sum(g_nd(z_new)) # the constraints are not violated!
+
+sum(g_nd(z_new))
 
 idx = idx_exclusive(kuramoto_plastic!, ["e_22", "de_22"])
 Frand = random_force(kuramoto_plastic!, [0.0, 1.0], Uniform, idx)
 z_new = ambient_forcing(kuramoto_plastic!, x0_plastic, 2.0, Frand)
-sum(g_nd(z_new)) # still the constraints are fulfilled!
+
+sum(g_nd(z_new))
 
 # This file was generated using Literate.jl, https://github.com/fredrikekre/Literate.jl
 
