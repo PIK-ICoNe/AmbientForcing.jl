@@ -25,7 +25,7 @@ mass_matrix_plasticedge[2,2] = 1. # First variables is set to 0
 plasticedge = ODEEdge(f! = kuramoto_plastic_edge!, dim=2, sym=[:e, :de], coupling=:undirected,mass_matrix = mass_matrix_plasticedge);
 kuramoto_plastic! = network_dynamics(plasticvertex, plasticedge, g)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(::SciMLBase.ODEFunction{true, nd_ODE_ODE{SimpleGraph{Int64}, GraphData{NetworkDynamics.NetworkStructures.GraphDataBuffer{SubArray{Float64, 1, Vector{Float64}, Tuple{UnitRange{Int64}}, true}, SubArray{Float64, 1, Vector{Float64}, Tuple{UnitRange{Int64}}, true}}, Float64, Float64}, ODEVertex{typeof(Main.kuramoto_plastic_vertex!)}, ODEEdge{NetworkDynamics.ComponentFunctions.var&quot;#37#44&quot;{typeof(Main.kuramoto_plastic_edge!), Int64}}}, SparseArrays.SparseMatrixCSC{Float64, Int64}, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Vector{Symbol}, Nothing, typeof(SciMLBase.DEFAULT_OBSERVED), Nothing}) (generic function with 7 methods)</code></pre><p>Using a random inital condition x0 violates the constraints! The constraints are fulfilled when g(x) ≈ 0.</p><pre><code class="language-julia hljs">x0_plastic = rand(106)
 g_nd = constraint_equations(kuramoto_plastic!)
-sum(g_nd(x0_plastic))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">-22.679893740752355</code></pre><p>Using zeros as the intial conditions for the ambient forcing algo</p><pre><code class="language-julia hljs">x0_plastic = zeros(106)
+sum(g_nd(x0_plastic))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">-25.145288957949035</code></pre><p>Using zeros as the intial conditions for the ambient forcing algo</p><pre><code class="language-julia hljs">x0_plastic = zeros(106)
 g_nd = constraint_equations(kuramoto_plastic!)
 g_nd(x0_plastic)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">48-element Vector{Float64}:
  0.0
@@ -49,45 +49,45 @@ g_nd(x0_plastic)</code></pre><pre class="documenter-example-output"><code class=
  0.0
  0.0</code></pre><p>Perturbing all variables at once</p><pre><code class="language-julia hljs">Frand = random_force(kuramoto_plastic!, [0.0, 1.0], Uniform)
 z_new = ambient_forcing(kuramoto_plastic!, x0_plastic, 2.0, Frand)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">106-element Vector{Float64}:
-  1.501413831192507
-  1.052883703085213
-  1.4851148099233549
-  1.3743780097938747
-  1.0006095531937216
-  1.3458123279406984
-  0.30760533293794284
-  0.49384445653196624
-  1.8499702998194663
-  1.6076692412397493
-  ⋮
-  1.8618816721047868
- -0.02581258559479736
-  0.3880224099934143
-  0.11727210188222478
-  1.2807376556783452
- -0.04364087246732538
-  0.9351823713642855
-  0.06559384558619677
-  0.6656867776864783</code></pre><p>As we can see the constraints are not violated!</p><pre><code class="language-julia hljs">sum(g_nd(z_new))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1.1346884994396095e-6</code></pre><p>Perturbing only the variables e<em>22 and de</em>22</p><pre><code class="language-julia hljs">idx = idx_exclusive(kuramoto_plastic!, [&quot;e_22&quot;, &quot;de_22&quot;])
+ 0.9495158283343199
+ 1.4266332997322626
+ 1.47081637185162
+ 0.4684564913393808
+ 1.332364587096779
+ 1.4908916457785302
+ 1.7174496270880406
+ 0.6081751596793654
+ 0.717816534641603
+ 1.2129757374090615
+ ⋮
+ 0.9385925031395133
+ 0.07559318075343181
+ 1.524880910773049
+ 0.05201290777780649
+ 0.7731043272236049
+ 0.004165778974397539
+ 1.7714906877287442
+ 0.1339362402443373
+ 1.4195277810051172</code></pre><p>As we can see the constraints are not violated!</p><pre><code class="language-julia hljs">sum(g_nd(z_new))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2.3822173117167902e-7</code></pre><p>Perturbing only the variables e<em>22 and de</em>22</p><pre><code class="language-julia hljs">idx = idx_exclusive(kuramoto_plastic!, [&quot;e_22&quot;, &quot;de_22&quot;])
 Frand = random_force(kuramoto_plastic!, [0.0, 1.0], Uniform, idx)
 z_new = ambient_forcing(kuramoto_plastic!, x0_plastic, 2.0, Frand)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">106-element Vector{Float64}:
- -2.507937013169867e-33
- -2.0724424376722323e-35
- -3.5849658616802906e-33
- -3.0718831481126643e-16
-  3.770263440466656e-33
-  2.3356980442063293e-33
-  0.07196998083832021
- -3.078085576237012e-38
- -2.287014309343317e-34
- -0.07196998083832028
+ -5.235305697676557e-72
+  1.0752523708399443e-34
+  2.4030041078249493e-33
+ -1.1055050544586014e-16
+ -9.739188064365318e-35
+ -8.864355216645935e-37
+  0.029221794303972044
+ -3.735927670428523e-36
+ -0.02922179430397203
+  3.050276441118561e-35
   ⋮
-  1.533555559421713e-19
-  6.6875407951891256e-21
-  1.1377523966629666e-19
-  6.401832736155537e-22
-  1.0891448383890506e-20
- -2.7679738037186573e-34
-  1.806950569924223e-35
-  9.091249968282343e-36
-  1.2284428625825437e-37</code></pre><p>Still the constraints are fulfilled!</p><pre><code class="language-julia hljs">sum(g_nd(z_new))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">8.05797997009593e-9</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="DifferentialEquation_example.html">« DiffEq</a><a class="docs-footer-nextpage" href="PowerDynamics_example.html">PowerDynamics »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.5 on <span class="colophon-date" title="Friday 13 August 2021 12:12">Friday 13 August 2021</span>. Using Julia version 1.6.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+  3.7632080481075717e-20
+  3.4256276592374173e-22
+  5.609590999629684e-21
+ -5.258813600157405e-23
+ -9.323626212552244e-22
+  1.2533796056123807e-37
+  2.1323767493722716e-36
+  3.112605281859537e-40
+  5.29548039818737e-39</code></pre><p>Still the constraints are fulfilled!</p><pre><code class="language-julia hljs">sum(g_nd(z_new))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5.489577788667608e-10</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="DifferentialEquation_example.html">« DiffEq</a><a class="docs-footer-nextpage" href="PowerDynamics_example.html">PowerDynamics »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.5 on <span class="colophon-date" title="Tuesday 17 August 2021 14:26">Tuesday 17 August 2021</span>. Using Julia version 1.6.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
