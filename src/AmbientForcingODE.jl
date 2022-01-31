@@ -23,7 +23,7 @@ Draws random initial condition form the constraint manifold M.
 
 This consists of the following steps:
     1. Draw a random vector Frand from the ambient space
-    2. Projetion back onto the tangetial space TxM by using PN
+    2. Projection back onto the tangential space TxM by using PN
 
 # Arguments
     f: An ODEFunction in mass matrix form
@@ -44,7 +44,7 @@ end
 
 Calculates the orthogonal projection matrix on a subspace N.
 
-A is a matrix containg the basis vectors of N as columns.
+A is a matrix containing the basis vectors of N as columns.
 The matrix (A^T*A)^-1 recovers the norm.
 """
 Proj_N(A) = A * inv(transpose(A) * A) * transpose(A)
@@ -57,7 +57,7 @@ ż = Pn(ker(Jg)) * h
 # Arguments
     `p[1]`: g the function defining the manifold
     `p[2]` h constant vector from ambient space
-    `u0`: Inital condition
+    `u0`: Initial condition
     `t`: Integration time
 """
 function ambient_forcing_ODE(u, p, t)

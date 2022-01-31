@@ -23,7 +23,7 @@ end
 """
     random_force(f::ODEFunction, dist_args, dist::UnionAll, idx_vec::Array{Array{Float64}})
 
-Perturbes only the variables in given in idx_vec. Each variable is initalized using its own distribution.
+Perturbs only the variables in given in idx_vec. Each variable is initialized using its own distribution.
 """
 function random_force(f::ODEFunction, dist_args::Array{Array{Float64, 1}, 1}, 
                     dist::UnionAll, idx_vec)
@@ -42,7 +42,7 @@ end
 """
     random_force(f::ODEFunction, dist_args::Array{Float64}, dist::UnionAll, idx_vec)
 
-Perturbes only the variables in given in idx_vec.
+Perturbs only the variables in given in idx_vec.
 """
 function random_force(f::ODEFunction, dist_args::Array{Float64}, 
                     dist::UnionAll, idx_vec)
@@ -57,7 +57,7 @@ end
 
 """
     random_force(f::ODEFunction, dist_args, dist::UnionAll)
-Perturbes all variables.
+Perturbs all variables.
 """
 function random_force(f::ODEFunction, dist_args::Array{Float64}, dist::UnionAll)
     M = f.mass_matrix
