@@ -5,7 +5,7 @@ Returns the constraint equations from an ODEFunction f used in DifferentialEquat
 
 f must be in Mass Matrix form meaning: M ẋ = f(x).
 """
-function constraint_equations(f::ODEFunction)
+function constraint_equations(f::ODEFunction, p = nothing)
     M = f.mass_matrix
     if M == true*I
         error("There are no constraints in the system!")
@@ -13,7 +13,7 @@ function constraint_equations(f::ODEFunction)
     len_M = size(M, 1)
     g_idx = findall([M[i,i] for i in 1:len_M] .== 0)
     g(x) = (dx = similar(x);
-            f(dx, x, nothing, 0.0);
+            f(dx, x, p, 0.0);
             dx[g_idx])
 end
 
