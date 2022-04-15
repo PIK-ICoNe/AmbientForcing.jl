@@ -1,68 +1,82 @@
-"""
-    constraint_equations(f::ODEFunction)
+using Symbolics
+using LinearAlgebra
 
-Returns the constraint equations from an ODEFunction f used in DifferentialEquations.jl.
 
-f must be in Mass Matrix form meaning: M ẋ = f(x).
 """
-function constraint_equations(f::ODEFunction, p = nothing)
-    M = f.mass_matrix
-    if M == true*I
-        error("There are no constraints in the system!")
-    end
-    len_M = size(M, 1)
-    g_idx = findall([M[i,i] for i in 1:len_M] .== 0)
-    g(x) = (dx = similar(x);
-            f(dx, x, p, 0.0);
-            dx[g_idx])
+    constrained_jac_from_f(f::ODEFunction)
+
+    Returns a mutating functions (_out,u) that writes
+    the Jacobian of the constraint equations of f at u into
+    the Matrix _out. 
+"""
+function constrained_jac_from_f(f::ODEFunction, dim, const_idx)
+    # Create symbolic vectors for states and derivatives
+    @variables usym[1:dim]
+    @variables _dusym[1:dim]
+    dusym = collect(_dusym)
+    f(dusym, collect(usym), nothing, 0.0) # mutate dusym
+    duconst = simplify.(dusym[const_idx])
+    # This builds a jacobian (could be sparse?)
+    # [!] We should offer an option for parameters
+    symjac = Symbolics.jacobian(duconst, collect(usym))
+    return Symbolics.build_function(symjac, usym, expression=Val{false})[2]
 end
 
 """
-    AmbientForcing(f::ODEFunction, z, tau, Frand)
-Draws random initial condition form the constraint manifold M.
-
-This consists of the following steps:
-    1. Draw a random vector Frand from the ambient space
-    2. Projection back onto the tangential space TxM by using PN
-
-# Arguments
-    f: An ODEFunction in mass matrix form
-    initial_con: A point which lays on the manifold M, could e.g. be a fixed point
-    dist_args: Arguments of the distribution function dist
-    dist: Distribution function e.g. Uniform, Normal....
-    tau: Integration time
+Throws an error if f has no constraints in
+    mass_matrix form or if the mass_matrix is not diagonal.
 """
 function ambient_forcing(f::ODEFunction, z, tau, Frand)
-    g = constraint_equations(f)
-    prob = ODEProblem(ambient_forcing_ODE, z, (0.0, tau), (g, Frand))
-    sol = solve(prob, Tsit5(), save_everystep=false)
-    return sol[end]
+    # Check for consistent constraints
+    M = f.mass_matrix
+    M == I && error("There are no constraints in the system!")
+    M != Diagonal(M) && error("The constraints are not diagonal.")
+    dim = size(M, 1)
+    cidx = findall(diag(M) .== 0)
+    cdim = length(cidx)
+    # [!] We could offer different methods based on Symbolics or ForwardDiff
+    fjac = constrained_jac_from_f(f, dim, cidx)
+    # Initialize the buffers for the Jacobian of the constraints J
+    # and the intermediate vectors
+    J = similar(Frand, cdim, dim)
+    invJJT = similar(Frand, cdim, cdim)
+    buff1 = similar(Frand, cdim)
+    buff2 = similar(Frand, cdim)
+    nafo = AmbientForcingODE(fjac, J, invJJT, buff1, buff2)
+    prob = ODEProblem(nafo, z, (0.0, tau), Frand)
+    return prob
+end
+
+struct AmbientForcingODE{T,S}
+    fjac::T
+    J::Matrix{S}
+    invJJT::Matrix{S}
+    buff1::Vector{S}
+    buff2::Vector{S}
 end
 
 """
-    Proj_N(A)
+    function (afo::AmbientForcingODE)(du, u, Frand, t)
 
-Calculates the orthogonal projection matrix on a subspace N.
+    Computes the projection of Frand onto the nullspace of 
+    the Jacobian afo.J at u by evaluating
 
-A is a matrix containing the basis vectors of N as columns.
-The matrix (A^T*A)^-1 recovers the norm.
+    `(I - J^T * inv(J * J^T) * J) * Frand`
+
+    at stores it in du.
+    
+    Since manifolds have the same dimension everywhere the inverse
+    in this product should exist.
 """
-Proj_N(A) = A * inv(transpose(A) * A) * transpose(A)
-
-"""
-    ambient_forcing_ODE(u, p, t)
-The manifold preserving ODE version of a vector h.
-
-ż = Pn(ker(Jg)) * h
-# Arguments
-    `p[1]`: g the function defining the manifold
-    `p[2]` h constant vector from ambient space
-    `u0`: Initial condition
-    `t`: Integration time
-"""
-function ambient_forcing_ODE(u, p, t)
-    g, h = p
-    Jacg = jacobian(g, u)
-    N = nullspace(Jacg)
-    du = Proj_N(N) * h # Projection back onto the Manifold
+function (afo::AmbientForcingODE)(du, u, Frand, t)
+    # Evaluate Jacobian at u and save into J
+    afo.fjac(afo.J, u) # add (p,t)?
+    afo.invJJT .= inv(afo.J * transpose(afo.J))
+    # Allocation free matrix multiply
+    mul!(afo.buff1, afo.J, Frand)
+    mul!(afo.buff2, afo.invJJT, afo.buff1)
+    # Next two lines are du = Frand - J^T * buff2
+    du .= Frand
+    mul!(du, transpose(afo.J), afo.buff2, -1., 1)
+    return nothing
 end
