@@ -1,21 +1,12 @@
 name = "AmbientForcing"
 uuid = "e2f64fc7-2bff-4a84-bd3f-8a41fe73f145"
-authors = ["Anna and contributors"]
-version = "0.1.0"
+authors = ["Anna Büttner, Michael Lindner and contributors"]
+version = "0.2.0"
 
 [deps]
-ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
-julia = "1"
-
-[extras]
-Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
-PowerDynamics = "cc46b21f-1b17-51c2-b642-af74c3d3a8be"
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
-[targets]
-test = ["Test", "PowerDynamics", "Distributions"]
+julia = "1.6"
