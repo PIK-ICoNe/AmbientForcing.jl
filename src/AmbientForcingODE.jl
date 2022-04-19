@@ -23,7 +23,18 @@ function constrained_jac_from_f(f::ODEFunction, dim, const_idx)
 end
 
 """
-Throws an error if f has no constraints in
+    function ambient_forcing(f::ODEFunction, z, tau, Frand)
+
+    Returns an AmbientForcingProblem for a given constraint ODE function f.
+    z is an initial condition that fulfills the constraints, tau is the
+    integration period for the ambient forcing algorithm, Frand is a random 
+    direction from the ambient space.
+
+    The AmbientForcingODE describes the evolution of trajectories in 
+    the constant vector field Frand projected onto the tangential bundle 
+    of the constraint manifold.
+
+    Throws an error if f has no constraints in
     mass_matrix form or if the mass_matrix is not diagonal.
 """
 function ambient_forcing(f::ODEFunction, z, tau, Frand)
@@ -47,6 +58,14 @@ function ambient_forcing(f::ODEFunction, z, tau, Frand)
     return prob
 end
 
+
+"""
+    struct AmbientForcingODE{T,S}
+
+    fjac is a function returning the Jacobian matrix of the constraint equations
+    at a point u_0. J, invJJT, buff1, buff2 are buffers needed for the projection.
+
+"""
 struct AmbientForcingODE{T,S}
     fjac::T
     J::Matrix{S}
@@ -63,7 +82,7 @@ end
 
     `(I - J^T * inv(J * J^T) * J) * Frand`
 
-    at stores it in du.
+    and storing it in du.
     
     Since manifolds have the same dimension everywhere the inverse
     in this product should exist.
@@ -77,6 +96,6 @@ function (afo::AmbientForcingODE)(du, u, Frand, t)
     mul!(afo.buff2, afo.invJJT, afo.buff1)
     # Next two lines are du = Frand - J^T * buff2
     du .= Frand
-    mul!(du, transpose(afo.J), afo.buff2, -1., 1)
+    mul!(du, transpose(afo.J), afo.buff2, -1.0, 1)
     return nothing
 end
