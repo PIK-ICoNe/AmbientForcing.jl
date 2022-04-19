@@ -6,7 +6,8 @@ using OrdinaryDiffEq
 # This is an example from NetworkDynamics
 # https://github.com/PIK-ICoN/NetworkDynamics.jl/blob/master/examples/kuramoto_plasticity.jl
 # This only works with NetworkDynamics v0.5.0 or newer
-# The AmbientForcing part starts at line 55 
+
+# Further examples can be found in the test folder
 
 const N_plastic = 10 # number of nodes
 k = 4  # average degree
@@ -48,6 +49,8 @@ mass_matrix_plasticedge[2,2] = 1. # First variables is set to 0
 
 plasticedge = ODEEdge(f = kuramoto_plastic_edge!, dim=2, sym=[:e, :de], coupling=:undirected,mass_matrix = mass_matrix_plasticedge);
 kuramoto_plastic! = network_dynamics(plasticvertex, plasticedge, g)
+
+# Ambient Forcing starts here
 
 # Using a random inital condition x0 violates the constraints!
 # The constraints are fulfilled when g(x) ≈ 0.

@@ -2,7 +2,6 @@ using AmbientForcing
 using OrdinaryDiffEq
 using Test
 using LinearAlgebra
-using Symbolics
 
 using BenchmarkTools
 
@@ -26,6 +25,12 @@ odeg = ODEFunction(g, mass_matrix=M)
 prob = ODEProblem(odeg, u0, (0.0, 1.0))
 
 solve(prob, Rodas4())
-afoprob = ambient_forcing(odeg, u0, 10.0, Frand)
+afoprob = ambient_forcing_problem(odeg, u0, 10.0, Frand)
 sol = solve(afoprob, Tsit5(), save_everystep=false)
 @btime solve(afoprob, Tsit5(), save_everystep=false)
+
+afoprob_fd = ambient_forcing_problem(odeg, u0, 10.0, Frand, method=:ForwardDiff)
+sol_fd = solve(afoprob_fd, Tsit5(), save_everystep=false)
+@btime solve(afoprob_fd, Tsit5(), save_everystep=false)
+
+@test Array(sol) == Array(sol_fd)
