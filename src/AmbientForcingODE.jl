@@ -1,6 +1,49 @@
 using Symbolics
 using LinearAlgebra
+using OrdinaryDiffEq
 
+
+"""
+    function ambient_forcing(f::ODEProblem, z, tau, Frand)
+
+    Solves a given Ambient Forcing ODEProblem with initial condition z,
+    end time tau and ambient vector Frand.
+
+"""
+function ambient_forcing(afoprob::ODEProblem, z, tau, Frand)
+    !(typeof(afoprob.f.f) <: AmbientForcingODE) && error("Expected an AmbientForcingODE.")
+    return solve(remake(afoprob, u0=z, tspan=(0.0, tau), p=Frand),
+        Tsit5(), save_everystep=false, save_start=false)[end]
+end
+
+"""
+    function ambient_forcing(f::ODEProblem,  Frand)
+
+    Solves a given Ambient Forcing ODEProblem with ambient vector Frand.
+
+"""
+function ambient_forcing(afoprob::ODEProblem, Frand)
+    !(typeof(afoprob.f.f) <: AmbientForcingODE) && error("Expected an AmbientForcingODE.")
+    return solve(remake(afoprob, p=Frand),
+        Tsit5(), save_everystep=false, save_start=false)[end]
+end
+
+"""
+    constraint_equations(f::ODEFunction)
+Returns the constraint equations from an ODEFunction f used in DifferentialEquations.jl.
+f must be in Mass Matrix form meaning: M ẋ = f(x), with M diagonal.
+f should be inplace.
+"""
+function constraint_equations(f::ODEFunction, p=nothing)
+    M = f.mass_matrix
+    M == I && error("There are no constraints in the system!")
+    M != Diagonal(M) && error("The constraints are not diagonal.")
+    cidx = findall(diag(M) .== 0)
+    g(x) = (dx = similar(x);
+    f(dx, x, p, 0.0);
+    dx[cidx])
+    return g
+end
 
 """
     constrained_jac_from_f(f::ODEFunction)
@@ -23,7 +66,7 @@ function constrained_jac_from_f(f::ODEFunction, dim, const_idx)
 end
 
 """
-    function ambient_forcing(f::ODEFunction, z, tau, Frand)
+    function ambient_forcing_problem(f::ODEFunction, z, tau, Frand)
 
     Returns an AmbientForcingProblem for a given constraint ODE function f.
     z is an initial condition that fulfills the constraints, tau is the
@@ -37,7 +80,7 @@ end
     Throws an error if f has no constraints in
     mass_matrix form or if the mass_matrix is not diagonal.
 """
-function ambient_forcing(f::ODEFunction, z, tau, Frand)
+function ambient_forcing_problem(f::ODEFunction, z, tau, Frand)
     # Check for consistent constraints
     M = f.mass_matrix
     M == I && error("There are no constraints in the system!")
