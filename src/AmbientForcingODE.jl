@@ -51,15 +51,14 @@ end
 
     Returns a mutating functions (_out,u) that writes
     the Jacobian of the constraint equations of f at u into
-    the Matrix _out. Uses Symbolics
+    the Matrix _out. Uses Symbolics.jl
 """
-function constrained_jac_from_f(f::ODEFunction, dim, const_idx)
-
+function constrained_jac_from_f(f::ODEFunction, dim, cidx)
     @variables usym[1:dim]
     @variables _dusym[1:dim]
     dusym = collect(_dusym)
     f(dusym, collect(usym), nothing, 0.0) # mutate dusym
-    duconst = simplify.(dusym[const_idx])
+    duconst = simplify.(dusym[cidx])
     # This builds a jacobian (could be sparse?)
     # [!] We should offer an option for parameters
     symjac = Symbolics.jacobian(duconst, collect(usym))
@@ -68,13 +67,13 @@ end
 
 
 """
-    constrained_jac_from_f_fd(f::ODEFunction, dim, const_idx)
+    constrained_jac_from_f_fd(f::ODEFunction)
 
     Returns a mutating functions (_out,u) that writes
     the Jacobian of the constraint equations of f at u into
-    the Matrix _out. Uses ForwardDiff.
+    the Matrix _out. Uses ForwardDiff.jl
 """
-function constrained_jac_from_fd(f::ODEFunction, dim, const_idx)
+function constrained_jac_from_fd(f::ODEFunction)
     # [!] We should offer an option for parameters
     g = constraint_equations(f)
     return (_out, u) -> ForwardDiff.jacobian!(_out, g, u)
@@ -96,7 +95,7 @@ end
     Throws an error if f has no constraints in
     mass_matrix form or if the mass_matrix is not diagonal.
 """
-function ambient_forcing_problem(f::ODEFunction, z, tau, Frand)
+function ambient_forcing_problem(f::ODEFunction, z, tau, Frand; method = :Symbolics)
     # Check for consistent constraints
     M = f.mass_matrix
     M == I && error("There are no constraints in the system!")
@@ -104,8 +103,13 @@ function ambient_forcing_problem(f::ODEFunction, z, tau, Frand)
     dim = size(M, 1)
     cidx = findall(diag(M) .== 0)
     cdim = length(cidx)
-    # [!] We could offer different methods based on Symbolics or ForwardDiff
-    fjac = constrained_jac_from_fd(f, dim, cidx)
+    if method == :Symbolics
+        fjac = constrained_jac_from_f(f, dim, cidx)
+    elseif method == :ForwardDiff
+        fjac = constrained_jac_from_fd(f)
+    else
+        error("Invalid differentiation method specified: $(method).")
+    end
     # Initialize the buffers for the Jacobian of the constraints J
     # and the intermediate vectors
     J = similar(Frand, cdim, dim)
@@ -148,16 +152,13 @@ end
 """
 function (afo::AmbientForcingODE)(du, u, Frand, t)
     # Evaluate Jacobian at u and save into J
-    # afo.fjac(afo.J, u) # add (p,t)?
-    # afo.invJJT .= inv(afo.J * transpose(afo.J))
-    # # Allocation free matrix multiply
-    # mul!(afo.buff1, afo.J, Frand)
-    # mul!(afo.buff2, afo.invJJT, afo.buff1)
-    # # Next two lines are du = Frand - J^T * buff2
-    # du .= Frand
-    # mul!(du, transpose(afo.J), afo.buff2, -1.0, 1)
-    afo.fjac(afo.J, u)
-    N = nullspace(afo.J)
-    du .= N * inv(transpose(N) * N) * transpose(N) * Frand
+    afo.fjac(afo.J, u) # add (p,t)?
+    afo.invJJT .= inv(afo.J * transpose(afo.J))
+    # Allocation free matrix multiply
+    mul!(afo.buff1, afo.J, Frand)
+    mul!(afo.buff2, afo.invJJT, afo.buff1)
+    # Next two lines are du = Frand - J^T * buff2
+    du .= Frand
+    mul!(du, transpose(afo.J), afo.buff2, -1.0, 1)
     return nothing
 end
