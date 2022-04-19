@@ -1,6 +1,6 @@
 using AmbientForcing
 using NetworkDynamics, Distributions
-using LightGraphs
+using Graphs
 using OrdinaryDiffEq
 
 # This is an example from NetworkDynamics
@@ -42,11 +42,11 @@ const α = .2π
 const β = -.95π
 
 # NetworkDynamics Setup
-plasticvertex = ODEVertex(f! = kuramoto_plastic_vertex!, dim =1)
+plasticvertex = ODEVertex(f = kuramoto_plastic_vertex!, dim =1)
 mass_matrix_plasticedge = zeros(2,2)
 mass_matrix_plasticedge[2,2] = 1. # First variables is set to 0
 
-plasticedge = ODEEdge(f! = kuramoto_plastic_edge!, dim=2, sym=[:e, :de], coupling=:undirected,mass_matrix = mass_matrix_plasticedge);
+plasticedge = ODEEdge(f = kuramoto_plastic_edge!, dim=2, sym=[:e, :de], coupling=:undirected,mass_matrix = mass_matrix_plasticedge);
 kuramoto_plastic! = network_dynamics(plasticvertex, plasticedge, g)
 
 # Using a random inital condition x0 violates the constraints!
@@ -62,15 +62,16 @@ g_nd(x0_plastic)
 
 # Perturbing all variables at once
 Frand = random_force(kuramoto_plastic!, [0.0, 1.0], Uniform)
-z_new = ambient_forcing(kuramoto_plastic!, x0_plastic, 2.0, Frand)
+afoprob = ambient_forcing_problem(kuramoto_plastic!, x0_plastic, 2.0, Frand)
+z_new = ambient_forcing(afoprob, x0_plastic, 2.0, Frand)
 
 # As we can see the constraints are not violated!
-sum(g_nd(z_new)) 
+sum(g_nd(z_new))
 
 # Perturbing only the variables e_22 and de_22
 idx = idx_exclusive(kuramoto_plastic!, ["e_22", "de_22"])
 Frand = random_force(kuramoto_plastic!, [0.0, 1.0], Uniform, idx)
-z_new = ambient_forcing(kuramoto_plastic!, x0_plastic, 2.0, Frand)
+z_new = ambient_forcing(afoprob, x0_plastic, 2.0, Frand)
 
 # Still the constraints are fulfilled!
 sum(g_nd(z_new)) 

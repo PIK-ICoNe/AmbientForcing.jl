@@ -26,8 +26,6 @@ odeg = ODEFunction(g, mass_matrix=M)
 prob = ODEProblem(odeg, u0, (0.0, 1.0))
 
 solve(prob, Rodas4())
-@btime ambient_forcing_old(odeg, u0, 10.0, Frand)
-
 afoprob = ambient_forcing(odeg, u0, 10.0, Frand)
 sol = solve(afoprob, Tsit5(), save_everystep=false)
 @btime solve(afoprob, Tsit5(), save_everystep=false)
