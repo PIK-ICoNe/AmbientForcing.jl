@@ -1,6 +1,7 @@
 using Symbolics
 using LinearAlgebra
 using OrdinaryDiffEq
+using ForwardDiff
 
 
 """
@@ -46,14 +47,14 @@ function constraint_equations(f::ODEFunction, p=nothing)
 end
 
 """
-    constrained_jac_from_f(f::ODEFunction)
+    constrained_jac_from_f(f::ODEFunction, dim, const_idx)
 
     Returns a mutating functions (_out,u) that writes
     the Jacobian of the constraint equations of f at u into
-    the Matrix _out. 
+    the Matrix _out. Uses Symbolics
 """
 function constrained_jac_from_f(f::ODEFunction, dim, const_idx)
-    # Create symbolic vectors for states and derivatives
+
     @variables usym[1:dim]
     @variables _dusym[1:dim]
     dusym = collect(_dusym)
@@ -64,6 +65,21 @@ function constrained_jac_from_f(f::ODEFunction, dim, const_idx)
     symjac = Symbolics.jacobian(duconst, collect(usym))
     return Symbolics.build_function(symjac, usym, expression=Val{false})[2]
 end
+
+
+"""
+    constrained_jac_from_f_fd(f::ODEFunction, dim, const_idx)
+
+    Returns a mutating functions (_out,u) that writes
+    the Jacobian of the constraint equations of f at u into
+    the Matrix _out. Uses ForwardDiff.
+"""
+function constrained_jac_from_fd(f::ODEFunction, dim, const_idx)
+    # [!] We should offer an option for parameters
+    g = constraint_equations(f)
+    return (_out, u) -> ForwardDiff.jacobian!(_out, g, u)
+end
+
 
 """
     function ambient_forcing_problem(f::ODEFunction, z, tau, Frand)
@@ -89,7 +105,7 @@ function ambient_forcing_problem(f::ODEFunction, z, tau, Frand)
     cidx = findall(diag(M) .== 0)
     cdim = length(cidx)
     # [!] We could offer different methods based on Symbolics or ForwardDiff
-    fjac = constrained_jac_from_f(f, dim, cidx)
+    fjac = constrained_jac_from_fd(f, dim, cidx)
     # Initialize the buffers for the Jacobian of the constraints J
     # and the intermediate vectors
     J = similar(Frand, cdim, dim)
@@ -132,13 +148,16 @@ end
 """
 function (afo::AmbientForcingODE)(du, u, Frand, t)
     # Evaluate Jacobian at u and save into J
-    afo.fjac(afo.J, u) # add (p,t)?
-    afo.invJJT .= inv(afo.J * transpose(afo.J))
-    # Allocation free matrix multiply
-    mul!(afo.buff1, afo.J, Frand)
-    mul!(afo.buff2, afo.invJJT, afo.buff1)
-    # Next two lines are du = Frand - J^T * buff2
-    du .= Frand
-    mul!(du, transpose(afo.J), afo.buff2, -1.0, 1)
+    # afo.fjac(afo.J, u) # add (p,t)?
+    # afo.invJJT .= inv(afo.J * transpose(afo.J))
+    # # Allocation free matrix multiply
+    # mul!(afo.buff1, afo.J, Frand)
+    # mul!(afo.buff2, afo.invJJT, afo.buff1)
+    # # Next two lines are du = Frand - J^T * buff2
+    # du .= Frand
+    # mul!(du, transpose(afo.J), afo.buff2, -1.0, 1)
+    afo.fjac(afo.J, u)
+    N = nullspace(afo.J)
+    du .= N * inv(transpose(N) * N) * transpose(N) * Frand
     return nothing
 end
