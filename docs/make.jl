@@ -6,9 +6,7 @@ using Graphs
 using OrdinaryDiffEq
 
 # generate examples
-examples = [
-    joinpath(@__DIR__, "..", "examples", "NetworkDynamics_example.jl"),
-]
+examples = [joinpath(@__DIR__, "..", "examples", "NetworkDynamics_example.jl")]
 
 OUTPUT = joinpath(@__DIR__, "src/generated")
 isdir(OUTPUT) && rm(OUTPUT, recursive=true)
@@ -32,11 +30,11 @@ makedocs(;
     ),
     pages = [
         "Home" => "index.md",
-        "Examples" => ["NetworkDynamics" => "NetworkDynamics_example.md"]
+        "Network Dynamics Example" => "NetworkDynamics_example.md"
     ],
 )
 
 deploydocs(
     repo = "github.com/PIK-ICoNe/AmbientForcing.jl.git",
-    devbranch="main",
+    devbranch="symjac",
 )
