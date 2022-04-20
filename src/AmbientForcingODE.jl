@@ -1,7 +1,7 @@
-using Symbolics: jacobian!
+using Symbolics
 using LinearAlgebra
-using OrdinaryDiffEq: Tsit5, solve, ODEProblem, ODEFunction
-using ForwardDiff
+using OrdinaryDiffEq: Tsit5, solve, ODEProblem, ODEFunction, remake
+using ForwardDiff: jacobian!
 
 
 """
@@ -76,7 +76,7 @@ end
 function constrained_jac_from_fd(f::ODEFunction)
     # [!] We should offer an option for parameters
     g = constraint_equations(f)
-    return (_out, u) -> ForwardDiff.jacobian!(_out, g, u)
+    return (_out, u) -> jacobian!(_out, g, u)
 end
 
 
