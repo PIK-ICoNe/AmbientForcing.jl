@@ -52,13 +52,13 @@ kuramoto_plastic! = network_dynamics(plasticvertex, plasticedge, g)
 
 # Ambient Forcing starts here
 
-# Using a random inital condition x0 violates the constraints!
+# Using a random initial condition x0 violates the constraints!
 # The constraints are fulfilled when g(x) ≈ 0.
 x0_plastic = rand(106)
 g_nd = constraint_equations(kuramoto_plastic!)
 sum(g_nd(x0_plastic))
 
-# Using zeros as the intial conditions for the ambient forcing algo
+# Using zeros as the initial conditions for the ambient forcing algo
 x0_plastic = zeros(106)
 g_nd = constraint_equations(kuramoto_plastic!)
 g_nd(x0_plastic)

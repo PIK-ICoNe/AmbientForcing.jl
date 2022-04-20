@@ -20,7 +20,7 @@ using Test
     pg = PowerGrid(node_list, line_list)
     rpg = rhs(pg)
 
-    # Acessing the constraint equation g of the power grid
+    # Accessing the constraint equation g of the power grid
     g = constraint_equations(rpg)
 
     # The operation point is a fixed point and naturally lies on the manifold
@@ -35,26 +35,26 @@ using Test
     # First we want to perturb all variables in the grid
     Frand = random_force(rpg, [0.0, 1], Uniform)
     afoprob = ambient_forcing_problem(rpg, op.vec, 2.0, Frand, method=:ForwardDiff)
-    z_new_all = ambient_forcing(afoprob, op.vec, 2.0, Frand) # Our new valid inital condition
+    z_new_all = ambient_forcing(afoprob, op.vec, 2.0, Frand) # Our new valid initial condition
     @test isapprox(sum(g(z_new_all)), 0.0, atol=1e-8)
 
     ## Next: let's perturb just the voltage at node 3!
     # Getting the index of the real and imaginary part of the voltage
 
     idx = idx_exclusive(rpg, ["u_r_3", "u_i_3"])
-    # generate a vector only with non-vanishing componats the voltage at node 3
+    # generate a vector only with non-vanishing components the voltage at node 3
     Frand = random_force(rpg, [0.0, 1.0], Uniform, idx)
     z_new_node_3 = ambient_forcing(afoprob, Frand)
     @test isapprox(sum(g(z_new_node_3)), 0.0, atol=1e-8)
 
 
     # It is also possible to perturb the variable using different distributions:
-    # Typically SNBS the angle θ and ω are pertubed differently
+    # Typically SNBS the angle θ and ω are perturbed differently
     idx = idx_exclusive(rpg, ["u_r_2", "u_i_2", "θ_2", "ω_2"])
     τ = 2.0 # the integration time
 
     # When you want to sample eg. the angle θ from a box of [0, 2π] 
-    # You have to make sure to devide the distribution argument by the integration time τ
+    # You have to make sure to dived the distribution argument by the integration time τ
     dist_vec = [[0, 1], [0, 2], [0, 2π] ./ τ, [-5, 5] ./ τ]
 
     Frand = random_force(rpg, dist_vec, Uniform, idx)
@@ -88,7 +88,7 @@ end
     g_rober = constraint_equations(ode_rober)
     @test isapprox(sum(g_rober(u0)), 0.0, atol=1e-8)
 
-    # Randomly perturbing all varibales  
+    # Randomly perturbing all variables  
     Frand = random_force(ode_rober, [0.0, 1], Uniform)
     afoprob_rober = ambient_forcing_problem(ode_rober, u0, 2.0, Frand)
     z_new_all = ambient_forcing(afoprob_rober, Frand)

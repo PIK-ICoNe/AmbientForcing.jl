@@ -9,7 +9,9 @@ It can especially be useful when one wants to perturb single variables of a syst
 This is, for example, needed when one wants to calculate the Single Node Basin of a power grid with loads.
 The package can be used with any ODEFunction in mass matrix form but it is especially useful in combination with [NetworkDynamics.jl](https://github.com/PIK-ICoNe/NetworkDynamics.jl) or [PowerDynamics.jl](https://github.com/JuliaEnergy/PowerDynamics.jl).
 
-Check out the docs for more info and some examples.
+The paper which explains Ambient Forcing in depth is accessible under the [DOI](https://iopscience.iop.org/article/10.1088/1367-2630/ac6822).
+
+Check out the docs for more info on the package and some examples.
 
 AmbientForcing.jl is not fully published yet. In order to use it you have to manually add it from GitHub!
 
