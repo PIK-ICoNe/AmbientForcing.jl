@@ -12,9 +12,3 @@ The package can be used with any ODEFunction in mass matrix form but it is espec
 The paper which explains Ambient Forcing in depth is accessible under the [DOI](https://iopscience.iop.org/article/10.1088/1367-2630/ac6822).
 
 Check out the docs for more info on the package and some examples.
-
-AmbientForcing.jl is not fully published yet. In order to use it you have to manually add it from GitHub!
-
-```
-julia> ] add "https://github.com/PIK-ICoNe/AmbientForcing.jl"
-```
