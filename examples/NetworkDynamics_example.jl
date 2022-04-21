@@ -1,12 +1,13 @@
 using AmbientForcing
 using NetworkDynamics, Distributions
-using LightGraphs
+using Graphs
 using OrdinaryDiffEq
 
 # This is an example from NetworkDynamics
 # https://github.com/PIK-ICoN/NetworkDynamics.jl/blob/master/examples/kuramoto_plasticity.jl
 # This only works with NetworkDynamics v0.5.0 or newer
-# The AmbientForcing part starts at line 55 
+
+# Further examples can be found in the test folder
 
 const N_plastic = 10 # number of nodes
 k = 4  # average degree
@@ -42,35 +43,38 @@ const α = .2π
 const β = -.95π
 
 # NetworkDynamics Setup
-plasticvertex = ODEVertex(f! = kuramoto_plastic_vertex!, dim =1)
+plasticvertex = ODEVertex(f = kuramoto_plastic_vertex!, dim =1)
 mass_matrix_plasticedge = zeros(2,2)
 mass_matrix_plasticedge[2,2] = 1. # First variables is set to 0
 
-plasticedge = ODEEdge(f! = kuramoto_plastic_edge!, dim=2, sym=[:e, :de], coupling=:undirected,mass_matrix = mass_matrix_plasticedge);
+plasticedge = ODEEdge(f = kuramoto_plastic_edge!, dim=2, sym=[:e, :de], coupling=:undirected,mass_matrix = mass_matrix_plasticedge);
 kuramoto_plastic! = network_dynamics(plasticvertex, plasticedge, g)
 
-# Using a random inital condition x0 violates the constraints!
+# Ambient Forcing starts here
+
+# Using a random initial condition x0 violates the constraints!
 # The constraints are fulfilled when g(x) ≈ 0.
 x0_plastic = rand(106)
 g_nd = constraint_equations(kuramoto_plastic!)
 sum(g_nd(x0_plastic))
 
-# Using zeros as the intial conditions for the ambient forcing algo
+# Using zeros as the initial conditions for the ambient forcing algo
 x0_plastic = zeros(106)
 g_nd = constraint_equations(kuramoto_plastic!)
 g_nd(x0_plastic)
 
 # Perturbing all variables at once
 Frand = random_force(kuramoto_plastic!, [0.0, 1.0], Uniform)
-z_new = ambient_forcing(kuramoto_plastic!, x0_plastic, 2.0, Frand)
+afoprob = ambient_forcing_problem(kuramoto_plastic!, x0_plastic, 2.0, Frand)
+z_new = ambient_forcing(afoprob, x0_plastic, 2.0, Frand)
 
 # As we can see the constraints are not violated!
-sum(g_nd(z_new)) 
+sum(g_nd(z_new))
 
 # Perturbing only the variables e_22 and de_22
 idx = idx_exclusive(kuramoto_plastic!, ["e_22", "de_22"])
 Frand = random_force(kuramoto_plastic!, [0.0, 1.0], Uniform, idx)
-z_new = ambient_forcing(kuramoto_plastic!, x0_plastic, 2.0, Frand)
+z_new = ambient_forcing(afoprob, x0_plastic, 2.0, Frand)
 
 # Still the constraints are fulfilled!
 sum(g_nd(z_new)) 
