@@ -1,28 +1,4 @@
-using Pkg
-Pkg.develop(path=dirname(@__DIR__))
-# headless GK to fix ci
-ENV["GKSwstype"] = "100"
-
-using Documenter
-using Literate
-
-using AmbientForcing
-using NetworkDynamics, Distributions
-using Graphs
-using OrdinaryDiffEq
-
-# generate examples
-examples = [joinpath(@__DIR__, "..", "examples", "NetworkDynamics_example.jl")]
-
-OUTPUT = joinpath(@__DIR__, "src/generated")
-isdir(OUTPUT) && rm(OUTPUT, recursive=true)
-mkpath(OUTPUT)
-
-for ex in examples
-    println(OUTPUT)
-    Literate.markdown(ex, OUTPUT)
-    Literate.script(ex, OUTPUT)
-end
+using Documenter, AmbientForcing
 
 makedocs(;
     modules=[AmbientForcing],
@@ -30,12 +6,12 @@ makedocs(;
     repo = "https://github.com/PIK-ICoNe/AmbientForcing.jl",
     sitename = "AmbientForcing.jl",
     pages = [
-        "Home" => "index.md",
-        "Network Dynamics Example" => "NetworkDynamics_example.md"
-    ],
-)
+        "Ambient Forcing Docs" => "index.md",
+        "Examples" => [
+            "DifferentialEquations.jl Example" => "diffeq.md",
+            "NetworkDynamics.jl Example" => "network_dynamics.md",
+            "PowerDynamics.jl Example" => "power_dynamics.md"
+    ]
+])
 
-deploydocs(;
-    repo = "github.com/PIK-ICoNe/AmbientForcing.jl.git",
-    devbranch="main",
-)
+deploydocs(repo = "github.com/PIK-ICoNe/AmbientForcing.jl.git")

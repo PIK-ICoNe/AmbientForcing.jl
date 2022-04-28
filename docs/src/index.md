@@ -1,7 +1,3 @@
-```@meta
-CurrentModule = AmbientForcing
-```
-
 # AmbientForcing
 
 A package that can calculate valid initial conditions for differential-algebraic equations (DAEs) in mass matrix form.
@@ -17,13 +13,4 @@ AmbientForcing.jl is not fully published yet. In order to use it you have to man
 
 ```
 julia> ] add "https://github.com/PIK-ICoNe/AmbientForcing.jl"
-```
-
-```@contents
-Pages = [
-    "DifferentialEquation_example.md",
-    "NetworkDynamics_example.md",
-    "PowerDynamics_example.md",
-]
-Depth = 1
 ```
