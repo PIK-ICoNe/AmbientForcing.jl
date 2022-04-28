@@ -4,7 +4,7 @@ using Graphs
 using OrdinaryDiffEq
 
 # This is an example from NetworkDynamics
-# https://github.com/PIK-ICoN/NetworkDynamics.jl/blob/master/examples/kuramoto_plasticity.jl
+# https://github.com/PIK-ICoN/NetworkDynamics.jl/blob/main/examples/kuramoto_plasticity.jl
 # This only works with NetworkDynamics v0.5.0 or newer
 
 # Further examples can be found in the test folder

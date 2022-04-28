@@ -1,40 +1,17 @@
-using Documenter
-using Literate
-using AmbientForcing
-using NetworkDynamics, Distributions
-using Graphs
-using OrdinaryDiffEq
-
-# generate examples
-examples = [joinpath(@__DIR__, "..", "examples", "NetworkDynamics_example.jl")]
-
-OUTPUT = joinpath(@__DIR__, "src/generated")
-isdir(OUTPUT) && rm(OUTPUT, recursive=true)
-mkpath(OUTPUT)
-
-for ex in examples
-    println(OUTPUT)
-    Literate.markdown(ex, OUTPUT)
-    Literate.script(ex, OUTPUT)
-end
+using Documenter, AmbientForcing
 
 makedocs(;
     modules=[AmbientForcing],
     authors = "Anna Büttner, Michael Lindner and contributors",
     repo = "https://github.com/PIK-ICoNe/AmbientForcing.jl",
     sitename = "AmbientForcing.jl",
-    format = Documenter.HTML(;
-        prettyurls = get(ENV, "CI", "false") == "false",
-        canonical = "https://github.com/PIK-ICoNe/AmbientForcing.jl",
-        assets = String[],
-    ),
     pages = [
-        "Home" => "index.md",
-        "Network Dynamics Example" => "NetworkDynamics_example.md"
-    ],
-)
+        "Ambient Forcing Docs" => "index.md",
+        "Examples" => [
+            "DifferentialEquations.jl Example" => "diffeq.md",
+            "NetworkDynamics.jl Example" => "network_dynamics.md",
+            "PowerDynamics.jl Example" => "power_dynamics.md"
+    ]
+])
 
-deploydocs(
-    repo = "github.com/PIK-ICoNe/AmbientForcing.jl.git",
-    devbranch="symjac",
-)
+deploydocs(repo = "github.com/PIK-ICoNe/AmbientForcing.jl.git")
