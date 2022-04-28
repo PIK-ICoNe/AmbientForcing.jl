@@ -1,5 +1,11 @@
+using Pkg
+Pkg.develop(path=dirname(@__DIR__))
+# headless GK to fix ci
+ENV["GKSwstype"] = "100"
+
 using Documenter
 using Literate
+
 using AmbientForcing
 using NetworkDynamics, Distributions
 using Graphs
@@ -23,18 +29,13 @@ makedocs(;
     authors = "Anna Büttner, Michael Lindner and contributors",
     repo = "https://github.com/PIK-ICoNe/AmbientForcing.jl",
     sitename = "AmbientForcing.jl",
-    format = Documenter.HTML(;
-        prettyurls = get(ENV, "CI", "false") == "false",
-        canonical = "https://github.com/PIK-ICoNe/AmbientForcing.jl",
-        assets = String[],
-    ),
     pages = [
         "Home" => "index.md",
         "Network Dynamics Example" => "NetworkDynamics_example.md"
     ],
 )
 
-deploydocs(
+deploydocs(;
     repo = "github.com/PIK-ICoNe/AmbientForcing.jl.git",
-    devbranch="symjac",
+    devbranch="main",
 )
