@@ -1,0 +1,26 @@
+{
+  "upload_type": "software", 
+
+  "title": "AmbientForcing.jl",
+  
+  "creators": [
+    {
+      "name": "Buettner, Anna",
+      "affiliation": "Potsdam Institute for Climate Impact Research (PIK)",
+      "orcid": "0000-0002-3555-8173" 
+    },
+    {
+      "name": "Lindner, Michael",
+      "affiliation": "Potsdam Institute for Climate Impact Research (PIK)",
+      "orcid": "0000-0001-9697-7577" 
+    }
+  ],
+
+  "description": "A package that can calculate valid initial conditions for differential-algebraic equations (DAEs) in mass matrix form. The solutions of DAEs lie on constraint manifolds and not every state is valid anymore. Using the ambient forcing algorithm it is possible to calculate new valid states on the manifold. It can especially be useful when one wants to perturb single variables of a system. This is, for example, needed when one wants to calculate the Single Node Basin of a power grid with loads. The package can be used with any ODEFunction in mass matrix form but it is especially useful in combination with NetworkDynamics.jl or PowerDynamics.jl.",
+
+  "access_right": "open",
+  
+  "license": "MIT", 
+
+  "keywords": ["Potsdam Institute for Climate Impact Research", "PIK", "Software", "as-is", "Complex Networks", "Nonlinear Dynamics", "Energy", "RD4 - Complexity Science"]
+}
